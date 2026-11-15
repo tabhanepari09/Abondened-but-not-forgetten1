@@ -92,9 +92,8 @@ export const Home: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2 pointer-events-auto">
-            <span className={`hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono px-2 py-1 rounded border ${
-              backendOnline ? 'border-emerald-500/30 bg-emerald-950/40 text-emerald-400' : 'border-[#55DDF5]/20 bg-[#0A1020]/80 text-[#55DDF5]'
-            }`}>
+            <span className={`hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono px-2 py-1 rounded border ${backendOnline ? 'border-emerald-500/30 bg-emerald-950/40 text-emerald-400' : 'border-[#55DDF5]/20 bg-[#0A1020]/80 text-[#55DDF5]'
+              }`}>
               <Server className="w-3 h-3" />
               <span>{backendOnline ? 'FASTAPI ONLINE' : 'API READY'}</span>
             </span>

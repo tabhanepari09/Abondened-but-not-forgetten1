@@ -175,11 +175,10 @@ export const Quiz: React.FC = () => {
             {/* Explanation Card when submitted */}
             {isAnswerSubmitted && (
               <div
-                className={`p-4 rounded-xl border text-xs leading-relaxed ${
-                  selectedOption === currentQ.correctIndex
+                className={`p-4 rounded-xl border text-xs leading-relaxed ${selectedOption === currentQ.correctIndex
                     ? 'border-emerald-500/40 bg-emerald-950/20 text-[#E8EDF5]'
                     : 'border-amber-500/40 bg-amber-950/20 text-[#E8EDF5]'
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2 font-mono font-semibold mb-1">
                   {selectedOption === currentQ.correctIndex ? (
@@ -201,11 +200,10 @@ export const Quiz: React.FC = () => {
                 <button
                   disabled={selectedOption === null}
                   onClick={handleConfirmAnswer}
-                  className={`px-6 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider font-bold transition-all ${
-                    selectedOption !== null
+                  className={`px-6 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider font-bold transition-all ${selectedOption !== null
                       ? 'bg-[#55DDF5] text-[#05070D] hover:bg-[#A5E9F5]'
                       : 'bg-[#101B32] text-[#A5A5A5] opacity-50 cursor-not-allowed'
-                  }`}
+                    }`}
                 >
                   TRANSMIT RESPONSE
                 </button>
@@ -234,9 +232,8 @@ export const Quiz: React.FC = () => {
                 <span className="text-xs font-mono uppercase tracking-widest text-[#55DDF5]">
                   EVALUATION CONCLUDED
                 </span>
-                <span className={`px-2 py-0.5 rounded text-[10px] font-mono border ${
-                  backendStatus ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400' : 'border-[#55DDF5]/30 bg-[#0A1020] text-[#55DDF5]'
-                }`}>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-mono border ${backendStatus ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400' : 'border-[#55DDF5]/30 bg-[#0A1020] text-[#55DDF5]'
+                  }`}>
                   {backendStatus ? 'REST FASTAPI VERIFIED' : 'LOCAL CACHE'}
                 </span>
               </div>
@@ -252,8 +249,8 @@ export const Quiz: React.FC = () => {
                 {score === quizQuestions.length
                   ? 'Flawless mission-control rating! You demonstrated expert mastery of off-world heritage sites and planetary science.'
                   : score >= 5
-                  ? 'Strong performance! You have a solid understanding of lunar and Martian exploration artifacts.'
-                  : 'Good attempt! Explore the 3D archive and interactive map to further deepen your knowledge of space heritage.'}
+                    ? 'Strong performance! You have a solid understanding of lunar and Martian exploration artifacts.'
+                    : 'Good attempt! Explore the 3D archive and interactive map to further deepen your knowledge of space heritage.'}
               </p>
             </div>
 
