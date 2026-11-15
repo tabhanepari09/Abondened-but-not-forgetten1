@@ -7,20 +7,20 @@ router = APIRouter(prefix="/api/artifacts", tags=["artifacts"])
 
 @router.get("", response_model=List[Artifact])
 def get_artifacts(
-    planet: Optional[str] = Query(None, description="Filter by celestial world: 'moon' or 'mars'"),
-    search: Optional[str] = Query(None, description="Search query for artifact name or mission"),
-    status: Optional[str] = Query(None, description="Filter by status (e.g. 'Preserved', 'Dormant')")
+    planet: Optional[str] = Query(default=None, description="Filter by celestial world: 'moon' or 'mars'"),
+    search: Optional[str] = Query(default=None, description="Search query for artifact name or mission"),
+    status: Optional[str] = Query(default=None, description="Filter by status (e.g. 'Preserved', 'Dormant')")
 ):
     results = ARTIFACTS_DATA
-    if planet:
+    if isinstance(planet, str) and planet:
         results = [a for a in results if a["planet"].lower() == planet.lower()]
-    if search:
+    if isinstance(search, str) and search:
         q = search.lower()
         results = [
             a for a in results
             if q in a["name"].lower() or q in a["mission"].lower() or q in a["coordinates"]["siteName"].lower()
         ]
-    if status:
+    if isinstance(status, str) and status:
         results = [a for a in results if status.lower() in a["currentStatus"].lower()]
     return results
 
