@@ -7,9 +7,9 @@ router = APIRouter(prefix="/api/photos", tags=["photos"])
 
 @router.get("", response_model=List[LivePhoto])
 def get_photos(
-    planet: Optional[str] = Query(None, description="Filter by celestial world: 'moon' or 'mars'")
+    planet: Optional[str] = Query(default=None, description="Filter by celestial world: 'moon' or 'mars'")
 ):
-    if planet:
+    if isinstance(planet, str) and planet:
         return [p for p in LIVE_PHOTOS_DATA if p["planet"].lower() == planet.lower()]
     return LIVE_PHOTOS_DATA
 

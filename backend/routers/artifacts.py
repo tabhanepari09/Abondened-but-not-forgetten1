@@ -37,3 +37,4 @@ def get_artifact_hotspots(artifact_id: str):
         if a["id"].lower() == artifact_id.lower():
             return a["hotspots"]
     raise HTTPException(status_code=404, detail=f"Artifact with ID '{artifact_id}' not found")
+

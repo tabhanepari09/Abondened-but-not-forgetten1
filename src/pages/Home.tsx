@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ArrowRight, Compass, Shield, MapPin, Radio, Sparkles, Eye, Layers, Camera } from 'lucide-react';
+import { ArrowRight, Compass, Shield, MapPin, Radio, Sparkles, Eye, Layers, Camera, Server } from 'lucide-react';
 import { SpaceCanvas } from '../components/3d/SpaceCanvas';
 import { Moon } from '../components/3d/Moon';
 import { Mars } from '../components/3d/Mars';
@@ -14,11 +14,30 @@ import { SegmentedMeter } from '../components/hud/SegmentedMeter';
 import { TargetTelemetryPanel } from '../components/hud/TargetTelemetryPanel';
 import { MissionDockStrip } from '../components/hud/MissionDockStrip';
 import { LivePhotoGallery } from '../components/ui/LivePhotoGallery';
+import { api } from '../services/api';
+import { LiveTelemetry } from '../types';
 
 export const Home: React.FC = () => {
   const [selectedArtifact, setSelectedArtifact] = useState(artifacts[0]); // Apollo 11 default
   const [isAutoRotating, setIsAutoRotating] = useState(true);
+  const [telemetry, setTelemetry] = useState<LiveTelemetry | null>(null);
+  const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
   const { playClick } = useSoundEffects();
+
+  useEffect(() => {
+    // Fetch live telemetry from FastAPI backend
+    api.getLiveTelemetry().then((t) => {
+      setTelemetry(t);
+    });
+    api.checkBackendStatus().then((res) => {
+      setBackendOnline(res.online);
+    });
+
+    const interval = setInterval(() => {
+      api.getLiveTelemetry().then((t) => setTelemetry(t));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const isMoon = selectedArtifact.planet === 'moon';
 
@@ -63,9 +82,22 @@ export const Home: React.FC = () => {
             <span className="hidden sm:inline-block text-[10px] font-mono text-[#A5A5A5] px-2 py-0.5 rounded bg-[#101B32]/70">
               TARGET LOCK: {selectedArtifact.shortName}
             </span>
+            {telemetry && (
+              <span className="hidden lg:inline-flex items-center gap-1.5 text-[10px] font-mono text-[#55DDF5] px-2.5 py-0.5 rounded bg-[#101B32]/90 border border-[#55DDF5]/25">
+                <Radio className="w-3 h-3 text-emerald-400 animate-pulse" />
+                <span>{telemetry.dsnStation.split('(')[0].trim()}</span>
+                <span className="text-emerald-400 font-semibold">{telemetry.signalStrengthDbm} dBm</span>
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-2 pointer-events-auto">
+            <span className={`hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono px-2 py-1 rounded border ${
+              backendOnline ? 'border-emerald-500/30 bg-emerald-950/40 text-emerald-400' : 'border-[#55DDF5]/20 bg-[#0A1020]/80 text-[#55DDF5]'
+            }`}>
+              <Server className="w-3 h-3" />
+              <span>{backendOnline ? 'FASTAPI ONLINE' : 'API READY'}</span>
+            </span>
             <Link
               to="/archive"
               className="px-3 py-1 rounded-lg border border-[#55DDF5]/30 bg-[#0A1020]/80 hover:bg-[#101B32] text-xs font-mono text-[#55DDF5] transition-colors"

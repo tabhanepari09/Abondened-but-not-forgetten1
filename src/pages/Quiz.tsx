@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SectionHeading } from '../components/ui/SectionHeading';
 import { GlassPanel } from '../components/ui/GlassPanel';
 import { quizQuestions } from '../data/quiz';
 import { useSoundEffects } from '../hooks/useSoundEffects';
 import { Link } from 'react-router-dom';
+import { api } from '../services/api';
+import { QuizEvaluationResult } from '../types';
 import {
   HelpCircle,
   CheckCircle2,
@@ -13,6 +15,7 @@ import {
   ArrowRight,
   Shield,
   Radio,
+  Server,
 } from 'lucide-react';
 
 export const Quiz: React.FC = () => {
@@ -21,8 +24,17 @@ export const Quiz: React.FC = () => {
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
   const [score, setScore] = useState(0);
   const [isQuizComplete, setIsQuizComplete] = useState(false);
+  const [answersLog, setAnswersLog] = useState<{ questionId: number; selectedIndex: number }[]>([]);
+  const [evalResult, setEvalResult] = useState<QuizEvaluationResult | null>(null);
+  const [backendStatus, setBackendStatus] = useState<boolean | null>(null);
 
   const { playClick, playBlip } = useSoundEffects();
+
+  useEffect(() => {
+    api.checkBackendStatus().then((res) => {
+      setBackendStatus(res.online);
+    });
+  }, []);
 
   const currentQ = quizQuestions[currentIndex];
   const progressPercent = Math.round(((currentIndex + 1) / quizQuestions.length) * 100);
@@ -36,6 +48,9 @@ export const Quiz: React.FC = () => {
   const handleConfirmAnswer = () => {
     if (selectedOption === null) return;
     setIsAnswerSubmitted(true);
+    const updatedAnswers = [...answersLog, { questionId: currentQ.id, selectedIndex: selectedOption }];
+    setAnswersLog(updatedAnswers);
+
     if (selectedOption === currentQ.correctIndex) {
       setScore((s) => s + 1);
       playBlip();
@@ -44,7 +59,7 @@ export const Quiz: React.FC = () => {
     }
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     if (currentIndex + 1 < quizQuestions.length) {
       setCurrentIndex((i) => i + 1);
       setSelectedOption(null);
@@ -53,6 +68,9 @@ export const Quiz: React.FC = () => {
     } else {
       setIsQuizComplete(true);
       playBlip();
+      // Evaluate via FastAPI endpoint
+      const result = await api.evaluateQuiz(answersLog);
+      setEvalResult(result);
     }
   };
 
@@ -61,6 +79,8 @@ export const Quiz: React.FC = () => {
     setSelectedOption(null);
     setIsAnswerSubmitted(false);
     setScore(0);
+    setAnswersLog([]);
+    setEvalResult(null);
     setIsQuizComplete(false);
     playClick();
   };
@@ -210,12 +230,24 @@ export const Quiz: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <span className="text-xs font-mono uppercase tracking-widest text-[#55DDF5]">
-                EVALUATION CONCLUDED
-              </span>
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-xs font-mono uppercase tracking-widest text-[#55DDF5]">
+                  EVALUATION CONCLUDED
+                </span>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-mono border ${
+                  backendStatus ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400' : 'border-[#55DDF5]/30 bg-[#0A1020] text-[#55DDF5]'
+                }`}>
+                  {backendStatus ? 'REST FASTAPI VERIFIED' : 'LOCAL CACHE'}
+                </span>
+              </div>
               <h3 className="text-3xl font-display font-bold text-[#E8EDF5]">
                 Final Score: {score} / {quizQuestions.length}
               </h3>
+              {evalResult?.rating && (
+                <div className="inline-block px-3 py-1 rounded-lg bg-[#55DDF5]/15 border border-[#55DDF5]/40 text-[#55DDF5] font-mono text-xs font-bold uppercase tracking-wider my-2">
+                  🎖️ {evalResult.rating}
+                </div>
+              )}
               <p className="text-sm text-[#E8EDF5]/70 font-light max-w-md mx-auto">
                 {score === quizQuestions.length
                   ? 'Flawless mission-control rating! You demonstrated expert mastery of off-world heritage sites and planetary science.'

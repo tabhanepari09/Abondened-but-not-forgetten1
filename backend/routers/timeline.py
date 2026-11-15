@@ -7,13 +7,13 @@ router = APIRouter(prefix="/api/timeline", tags=["timeline"])
 
 @router.get("", response_model=List[TimelineItem])
 def get_timeline(
-    planet: Optional[str] = Query(None, description="Filter by celestial world: 'moon' or 'mars'"),
-    artifact_id: Optional[str] = Query(None, description="Filter by artifact ID")
+    planet: Optional[str] = Query(default=None, description="Filter by celestial world: 'moon' or 'mars'"),
+    artifact_id: Optional[str] = Query(default=None, description="Filter by artifact ID")
 ):
     results = TIMELINE_DATA
-    if planet:
+    if isinstance(planet, str) and planet:
         results = [t for t in results if t.get("planet", "").lower() == planet.lower()]
-    if artifact_id:
+    if isinstance(artifact_id, str) and artifact_id:
         results = [t for t in results if t.get("artifactId", "").lower() == artifact_id.lower()]
     return results
 

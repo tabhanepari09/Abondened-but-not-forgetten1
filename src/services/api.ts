@@ -1,8 +1,8 @@
 import { Artifact, PlanetInfo, TimelineItem, QuizQuestion, LiveTelemetry, QuizEvaluationResult, Hotspot } from '../types';
-import { artifactsData } from '../data/artifacts';
+import { artifacts } from '../data/artifacts';
 import { planetsData } from '../data/missions';
 import { livePhotosCollection, LivePhoto } from '../data/livePhotos';
-import { timelineData } from '../data/timeline';
+import { timelineEvents } from '../data/timeline';
 import { quizQuestions } from '../data/quiz';
 
 const API_BASE = '/api';
@@ -51,7 +51,7 @@ class ApiService {
     }
 
     // Fallback to local data
-    let results = [...artifactsData];
+    let results = [...artifacts];
     if (planet) {
       results = results.filter((a) => a.planet === planet);
     }
@@ -81,7 +81,7 @@ class ApiService {
       this.isOnline = false;
     }
 
-    return artifactsData.find((a) => a.id.toLowerCase() === id.toLowerCase());
+    return artifacts.find((a: Artifact) => a.id.toLowerCase() === id.toLowerCase());
   }
 
   /**
@@ -98,7 +98,7 @@ class ApiService {
       this.isOnline = false;
     }
 
-    const artifact = artifactsData.find((a) => a.id.toLowerCase() === id.toLowerCase());
+    const artifact = artifacts.find((a: Artifact) => a.id.toLowerCase() === id.toLowerCase());
     return artifact ? artifact.hotspots : [];
   }
 
@@ -176,7 +176,7 @@ class ApiService {
       this.isOnline = false;
     }
 
-    let results = [...timelineData];
+    let results = [...timelineEvents];
     if (planet) {
       results = results.filter((t) => t.planet === planet);
     }
